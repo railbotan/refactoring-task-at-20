@@ -1,28 +1,37 @@
 from PIL import Image
 import numpy as np
-img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a - 11:
-    j = 0
-    while j < a1 - 11:
-        s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                n1 = arr[n][n1][0]
-                n2 = arr[n][n1][1]
-                n3 = arr[n][n1][2]
-                M = n1 + n2 + n3
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50
-                arr[n][n1][1] = int(s // 50) * 50
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+
+
+def get_avg_brightness(img_data, mosaic_size, x, y):
+    return np.average(img_data[x : x + mosaic_size, y : y + mosaic_size])
+
+
+def save_image(data, file_name, path):
+    Image.fromarray(data).save(f'{file_name}.{path.split(".")[-1]}')
+
+
+def create_mosaic(img_data, img_size, mosaic_size, grayscale_step):
+    for x in range(0, img_size[0], mosaic_size):
+        for y in range(0, img_size[1], mosaic_size):
+            avg_brightness = get_avg_brightness(img_data, mosaic_size, x, y)
+            img_data[x : x + mosaic_size, y : y + mosaic_size] = avg_brightness - avg_brightness % grayscale_step
+            
+
+def main():
+    path = input("Enter image path: ")
+    output_name = input("Enter name of output file: ")
+    mosaic_size = int(input("Enter mosaic size: "))
+    grayscale_step = int(input("Enter grayscale step: "))
+
+    img_data = np.array(Image.open(path))
+    img_size = img_data.shape
+
+    create_mosaic(img_data, img_size, mosaic_size, grayscale_step)
+    save_image(img_data, output_name, path)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        quit()
