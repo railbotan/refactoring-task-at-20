@@ -2,28 +2,38 @@ from PIL import Image
 import numpy as np
 
 
-img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a:
-    j = 0
-    while j < a1:
-        s = 0
-        for n in range(i, i + 10):
-            for n0 in range(j, j + 10):
-                n1 = int(arr[n][n0][0])
-                n2 = int(arr[n][n0][1])
-                n3 = int(arr[n][n0][2])
-                s += (n1 + n2 + n3) / 3
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50
-                arr[n][n1][1] = int(s // 50) * 50
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+def main():
+    img = Image.open("img2.jpg")
+
+    img_data = np.array(img)
+    img_size = img_data.shape
+    mosaic_size = 10
+    grayscale_step = 50
+
+    for x in range(0, img_size[0], mosaic_size):
+        for y in range(0, img_size[1], mosaic_size):
+            avg_brightness = get_avg_brightness(img_data, mosaic_size, x, y)
+            apply_grayscale(img_data, mosaic_size, grayscale_step, x, y, avg_brightness)
+
+    result = Image.fromarray(img_data)
+    result.save("res.jpg")
+
+
+def apply_grayscale(img_data, mosaic_size, grayscale_step, x, y, avg_brightness):
+    for x1 in range(x, x + mosaic_size):
+        for y1 in range(y, y + mosaic_size):
+            img_data[x1][y1][0] = img_data[x1][y1][1] = img_data[x1][y1][2] = (
+                int(avg_brightness // grayscale_step) * grayscale_step
+            )
+
+
+def get_avg_brightness(img_data, mosaic_size, x, y):
+    avg_brightness = 0
+    for x1 in range(x, x + mosaic_size):
+        for y1 in range(y, y + mosaic_size):
+            avg_brightness += int(sum(img_data[x1][y1])) // 3
+    return int(avg_brightness // mosaic_size ** 2)
+
+
+if __name__ == "__main__":
+    main()
