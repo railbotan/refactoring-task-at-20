@@ -2,27 +2,33 @@ from PIL import Image
 import numpy as np
 img = Image.open("img2.jpg")
 arr = np.array(img)
+size = 10
+gradation = 50
 a = len(arr)
 a1 = len(arr[1])
+
+
+def findMidValue(i, j, size):
+    global arr
+    matrix = arr[i:i + size, j:j + size, ::]
+    b = list(matrix.reshape(1, matrix.shape[0] * matrix.shape[1] * 3))[0]
+    b = list(map(lambda x: int(x)/3, b))
+    s = int(sum(b)// size**2)
+    return s
+
+
+def changeColour(i, j, size, gradation):
+    global arr
+    s = findMidValue(i, j, size)
+    arr[i:i + size, j:j + size, ::] = s
+
+
 i = 0
-while i < a - 11:
+while i <= a - 1:
     j = 0
-    while j < a1 - 11:
-        s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                n1 = arr[n][n1][0]
-                n2 = arr[n][n1][1]
-                n3 = arr[n][n1][2]
-                M = n1 + n2 + n3
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50
-                arr[n][n1][1] = int(s // 50) * 50
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
+    while j <= a1 - 1:
+        changeColour(i, j, size, gradation)
+        j = j + size
+    i = i + size
 res = Image.fromarray(arr)
 res.save('res.jpg')
