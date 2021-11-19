@@ -7,23 +7,12 @@ class pixelArtGenerator():
         self.shag = pixel_step
         self.gradation = 255 / gradations
 
-    def get_pixel_color(self, arr, i, j):
-        color_sum = 0
-        for n in range(i, i + self.step):
-                for m in range(j, j + self.step):
-                    m1 = arr[n][m][0]
-                    m2 = arr[n][m][1]
-                    m3 = arr[n][m][2]
-                    color_sum += int(m1) + int(m2) + int(n3)
-        return color_sum
+    def get_pixel_color(self, img_array, i, j):
+        return np.sum(img_array[i: i + self.step, j: j + self.shag]) // (10 * self.shag)
 
-    def set_pixel_color(self, arr, i, j, s):
-        for n in range(i, i + self.shag):
-                for m in range(j, j + self.shag):
-                    arr[n][m][0] = int(s // self.gradation) * self.gradation / 3
-                    arr[n][m][1] = int(s // self.gradation) * self.gradation / 3
-                    arr[n][m][2] = int(s // self.gradation) * self.gradation / 3
-        return arr
+    def set_pixel_color(self, img_array, i, j, s):
+        img_array[i: i + self.step, j: j + self.step] = int(s // self.gradation) * self.gradation / 3
+        return img_array 
 
     def generate(self, img):
         arr = np.array(img)
