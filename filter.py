@@ -1,28 +1,33 @@
 from PIL import Image
 import numpy as np
-img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a - 11:
-    j = 0
-    while j < a1 - 11:
-        s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                n1 = arr[n][n1][0]
-                n2 = arr[n][n1][1]
-                n3 = arr[n][n1][2]
-                M = n1 + n2 + n3
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50
-                arr[n][n1][1] = int(s // 50) * 50
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+
+
+def do_filter():
+    path_img = input("Введите путь к изображению: ")
+    name = input("Введите имя выходного изображения: ")
+    count_gradations = int(input("Введите количество градаций: "))
+    mosaic_size = int(input("Введите размер мозайки: "))
+    img = Image.open(path_img)
+    img_data = np.array(img)
+    size_img = img_data.shape
+
+    for i in range(0, size_img[0], mosaic_size):
+        for j in range(0, size_img[1], mosaic_size):
+            paint_cell(img_data, i, j, mosaic_size, count_gradations)
+
+    res = Image.fromarray(img_data)
+    path_output = path_img[0:path_img.rindex('\\') + 1]
+    res.save(f"{path_output}{name}")
+
+
+def find_average_brightness(img_data, width, height, mosaic_size):
+    return np.average(img_data[width: width + mosaic_size, height: height + mosaic_size])
+
+
+def paint_cell(img_data, width, height, mosaic_size, count_gradations):
+    gradations = 255 // count_gradations
+    average_brightness = find_average_brightness(img_data, width, height, mosaic_size)
+    img_data[width: width + mosaic_size, height: height + mosaic_size] = average_brightness // gradations * gradations
+
+
+do_filter()
