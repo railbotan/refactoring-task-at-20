@@ -2,10 +2,10 @@ from PIL import Image
 import numpy as np
 
 
-def pixel_colors_sum(elements):
-    n1 = elements[0]
-    n2 = elements[1]
-    n3 = elements[2]
+def pixel_colors_sum(pixel):
+    n1 = pixel[0]
+    n2 = pixel[1]
+    n3 = pixel[2]
     return int(n1) + int(n2) + int(n3)
 
 
@@ -42,8 +42,9 @@ def transform_image(file_name, gradation, blockSize):
     return Image.fromarray(arr)
 
 
-gradation = 5
-blockSize = 10
-
-res = transform_image("img2.jpg", gradation, blockSize)
-res.save('res.jpg')
+file_name = input("Введите имя входного файла")
+result_name = input("Введите имя выходного файла")
+gradation = int(input("Введите градацию"))
+blockSize = int(input("Введите размерами мозайки"))
+res = transform_image(file_name, gradation, blockSize)
+res.save(result_name)
