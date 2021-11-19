@@ -1,28 +1,36 @@
 from PIL import Image
 import numpy as np
-img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a:
-    j = 0
-    while j < a1:
-        s = 0
-        for n in range(i, i + 10):
-            for m in range(j, j + 10):
-                m1 = arr[n][m][0]
-                m2 = arr[n][m][1]
-                m3 = arr[n][m][2]
-                M = int(m1) + int(m2) + int(m3)
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for m in range(j, j + 10):
-                arr[n][m][0] = int(s // 50) * 50 / 3
-                arr[n][m][1] = int(s // 50) * 50 / 3
-                arr[n][m][2] = int(s // 50) * 50 / 3
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+
+class pixelArtGenerator():
+
+    def __init__(self, gradations= 6, pixel_step = 10):
+        self.shag = pixel_step
+        self.gradation = 255 / gradations
+
+    def get_pixel_color(self, arr, i, j):
+        color_sum = 0
+        for n in range(i, i + self.step):
+                for m in range(j, j + self.step):
+                    m1 = arr[n][m][0]
+                    m2 = arr[n][m][1]
+                    m3 = arr[n][m][2]
+                    color_sum += int(m1) + int(m2) + int(n3)
+        return color_sum
+
+    def set_pixel_color(self, arr, i, j, s):
+        for n in range(i, i + self.shag):
+                for m in range(j, j + self.shag):
+                    arr[n][m][0] = int(s // self.gradation) * self.gradation / 3
+                    arr[n][m][1] = int(s // self.gradation) * self.gradation / 3
+                    arr[n][m][2] = int(s // self.gradation) * self.gradation / 3
+        return arr
+
+    def generate(self, img):
+        arr = np.array(img)
+        a = len(arr)
+        a1 = len(arr[1])
+        for i in range(0, a, self.step):
+            for j in range(0, a1, self.step):
+                color_sum = self.get_pixel_color(arr, i, j) // (10 * self.shag)
+                arr = self.set_pixel_color(arr, i, j, color_sum)
+        return Image.fromarray(arr)
