@@ -1,28 +1,34 @@
 from PIL import Image
 import numpy as np
-img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a - 11:
-    j = 0
-    while j < a1 - 11:
-        s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                n1 = arr[n][n1][0]
-                n2 = arr[n][n1][1]
-                n3 = arr[n][n1][2]
-                M = n1 + n2 + n3
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50
-                arr[n][n1][1] = int(s // 50) * 50
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+
+
+def get_mid_bright(block, element_side, step):
+    midBright = block[:element_side, :element_side].sum() // (element_side * element_side)
+    return int(midBright // step) * step / 3
+
+
+def transform_img(arr, element_side, step):
+    length = len(arr)
+    width = len(arr[1])
+    for row in range(0, length, element_side):
+        for col in range(0, width, element_side):
+            arr[row: row + element_side, col: col + element_side] = get_mid_bright(
+                arr[row: row + element_side, col: col + element_side], element_side, step
+            )
+
+    return arr
+
+
+def main():
+    img = Image.open(input("Введите имя конвертируемого файла: "))
+    arr = np.array(img)
+    element_side = int(input("Введите размер элемента мозаики: "))
+    gradation = int(input("Введите количество градаций серого: "))
+    step = 255 // (gradation - 1)
+
+    res = Image.fromarray(transform_img(arr, element_side, step))
+    res.save(input("Введите имя файла для сохранения результата: "))
+
+
+if __name__ == '__main__':
+    main()
