@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+
 img = Image.open("img2.jpg")
 arr = np.array(img)
 a = len(arr)
@@ -26,3 +27,28 @@ while i < a - 11:
     i = i + 10
 res = Image.fromarray(arr)
 res.save('res.jpg')
+
+def main():
+    imageLocation = input("Путь к фото:")
+    resultName = input("Название результата:")
+    mosaicSize = int(input("Размер мозайки в пикселях:"))
+    gradationsCount = int(input("Количество градаций серого:"))
+    imageData = np.array(Image.open(imageLocation))
+    imageSize = imageData.shape
+
+    for x in range(0, imageSize[0], mosaicSize):
+        for y in range(0, imageSize[1], mosaicSize):
+            paintCell(imageData, x, y, mosaicSize, gradationsCount)
+
+    res = Image.fromarray(imageData)
+    outputLocation = imageLocation[0:imageLocation.rindex('\\') + 1]
+    res.save(f"{outputLocation}{resultName}")
+
+def paintCell(array, pxWidth, pxHeight, mosaicSize, gradationsCount):
+    averageBrightness = findAverageBrightness(array, pxWidth, pxHeight, mosaicSize)
+    gradations = 255 // gradationsCount
+    pxBrightness = averageBrightness // gradations * gradations
+    array[pxWidth:pxWidth + mosaicSize, pxHeight:pxHeight + mosaicSize, ][:] = pxBrightness
+    
+def findAverageBrightness(array, pxWidth, pxHeight, mosaicSize):
+    return np.average(array[pxWidth:pxWidth + mosaicSize, pxHeight: pxHeight + mosaicSize])
